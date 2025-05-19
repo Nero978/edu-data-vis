@@ -50,7 +50,7 @@ function draw() {
       ],
       grid: [
         { left: 60, right: 30, top: 40, height: 300 },
-        { left: 60, right: 30, top: 450, height: 300 }
+        { left: 60, right: 30, top: 400, height: 300 }
       ],
       xAxis: [
         { type: 'category', data: scoreArr, gridIndex: 0, name: '分数' },
@@ -79,13 +79,14 @@ function draw() {
       ],
       visualMap: [{
         min: 0,
-        max: Math.max(...heatData.map(d => d[2])),
+        max: Math.max(1, ...heatData.map(d => d[2])), // 保证max至少为1
         calculable: true,
         orient: 'horizontal',
         left: 'center',
-        top: 400,
+        top: 720, // 放在第二个grid下方
         inRange: { color: ['#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695'] },
-        show: true
+        show: true,
+        seriesIndex: 1 // 明确指定作用于heatmap
       }],
       tooltip: { trigger: 'item' }
     })
@@ -118,7 +119,7 @@ onUnmounted(() => {
 })
 </script>
 <template>
-  <div ref="containerRef" class="w-full h-[400px] bg-gradient-to-b from-blue-100 to-white rounded-lg shadow-md p-2 flex items-center justify-center relative">
+  <div ref="containerRef" class="w-full h-[800px] bg-gradient-to-b from-blue-100 to-white rounded-lg shadow-md p-2 flex items-center justify-center relative">
     <div ref="chartRef" class="w-full h-full"></div>
     <transition name="fade">
       <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
