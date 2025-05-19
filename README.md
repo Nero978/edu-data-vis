@@ -43,17 +43,33 @@ vis-front/        # Vue3前端
 
 ## 快速启动
 ### 后端（FastAPI）
-1. 进入 `vis-back` 目录：
+1. 安装 `uv` 目录：
    ```bash
-   cd vis-back
+   pip install uv
    ```
-2. 安装依赖：
+
+2. 创建虚拟环境：
    ```bash
-   pip install fastapi uvicorn pandas
+   uv venv
+   ```
+
+2. 激活虚拟环境：
+   - Windows:
+     ```bash
+     .\venv\Scripts\activate
+     ```
+    - Linux/Mac:
+      ```bash
+      source venv/bin/activate
+      ```
+
+3. 安装依赖：      
+   ```bash
+   uv sync
    ```
 3. 启动后端服务：
    ```bash
-   uvicorn main:app --reload
+   python run.py
    ```
    默认监听 http://localhost:8000
 
