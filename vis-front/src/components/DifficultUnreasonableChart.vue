@@ -1,12 +1,17 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, nextTick, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
 const props = defineProps({ submitRecords: Array, titleData: Array })
 const chartRef = ref(null)
 let chartInstance = null
+const loading = ref(true)
 
 function draw() {
-  if (!props.submitRecords?.length || !props.titleData?.length) return
+  loading.value = true
+  if (!props.submitRecords?.length || !props.titleData?.length || !chartRef.value) {
+    loading.value = false
+    return
+  }
   // 1. 题目ID到知识点
   const titleId2Knowledge = {}
   props.titleData.forEach(item => {
@@ -56,36 +61,55 @@ function draw() {
   const meanMastery = masteryArr.reduce((a,b) => a+b, 0) / (masteryArr.length || 1)
   const meanCorrect = correctArr.reduce((a,b) => a+b, 0) / (correctArr.length || 1)
   // 3. 绘制散点图
-  if (!chartInstance) chartInstance = echarts.init(chartRef.value)
-  chartInstance.setOption({
-    title: { text: '题目难度与答题者知识掌握度关系', left: 'center' },
-    tooltip: { 
-      trigger: 'item', 
-      formatter: p => `题号: ${p.data[2]}<br/>知识点: ${p.data[3]}<br/>平均掌握度: ${(p.data[0]*100).toFixed(1)}%<br/>正确率: ${(p.data[1]*100).toFixed(1)}%` 
-    },
-    xAxis: { name: '答题者平均知识掌握度', min: 0.15, max: 0.4 },
-    yAxis: { name: '题目正确率', min: 0, max: 0.6 },
-    series: [{
-      symbolSize: 14,
-      data: scatterData,
-      type: 'scatter',
-      encode: { x: 0, y: 1, tooltip: [2,3,0,1] },
-      itemStyle: {
-        color: d => (d.data && d.data[0] > meanMastery && d.data[1] < meanCorrect) ? '#e74c3c' : '#3498db'
+  if (!chartInstance && chartRef.value) chartInstance = echarts.init(chartRef.value)
+  if (chartInstance) {
+    chartInstance.setOption({
+      title: { text: '题目难度与答题者知识掌握度关系', left: 'center' },
+      tooltip: { 
+        trigger: 'item', 
+        formatter: p => `题号: ${p.data[2]}<br/>知识点: ${p.data[3]}<br/>平均掌握度: ${(p.data[0]*100).toFixed(1)}%<br/>正确率: ${(p.data[1]*100).toFixed(1)}%` 
       },
-      label: {
-        show: false
-      }
-    }]
-  })
+      xAxis: { name: '答题者平均知识掌握度', min: 0.15, max: 0.4 },
+      yAxis: { name: '题目正确率', min: 0, max: 0.6 },
+      series: [{
+        symbolSize: 14,
+        data: scatterData,
+        type: 'scatter',
+        encode: { x: 0, y: 1, tooltip: [2,3,0,1] },
+        itemStyle: {
+          color: d => (d.data && d.data[0] > meanMastery && d.data[1] < meanCorrect) ? '#e74c3c' : '#3498db'
+        },
+        label: {
+          show: false
+        }
+      }]
+    })
+  }
+  loading.value = false
 }
 
 onMounted(draw)
 watch([() => props.submitRecords, () => props.titleData], draw)
+onUnmounted(() => {
+  if (chartInstance) { chartInstance.dispose(); chartInstance = null }
+})
 </script>
 <template>
-  <div ref="chartRef" class="w-full h-[400px] bg-gradient-to-b from-blue-100 to-white rounded-lg shadow-md p-2 flex items-center justify-center"></div>
+  <div ref="chartRef" class="w-full h-[400px] bg-gradient-to-b from-blue-100 to-white rounded-lg shadow-md p-2 flex items-center justify-center relative">
+    <transition name="fade">
+      <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
+        <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+      </div>
+    </transition>
+  </div>
   <div style="max-width:900px;margin-top:8px;font-size:14px;">
     <b>可视分析说明：</b> 红色点表示“高掌握低正确率”题目，可能存在难度不合理。可点击点查看题号、知识点、掌握度与正确率。
   </div>
 </template>
+<style scoped>
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+</style>
