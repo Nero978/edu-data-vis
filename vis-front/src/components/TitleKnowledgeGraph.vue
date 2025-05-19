@@ -3,8 +3,11 @@ import { ref, onMounted, watch, nextTick, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
 const props = defineProps({ titleData: Array })
 const chartRef = ref(null)
+const containerRef = ref(null)
+const isVisible = ref(false)
 let chartInstance = null
 const loading = ref(true)
+let observer = null
 
 function draw() {
   loading.value = true
@@ -112,14 +115,33 @@ function draw() {
   loading.value = false
 }
 
-onMounted(draw)
-watch(() => props.titleData, draw)
+function tryDraw() {
+  if (isVisible.value) draw()
+}
+
+onMounted(() => {
+  observer = new window.IntersectionObserver(
+    entries => {
+      if (entries[0].isIntersecting) {
+        isVisible.value = true
+        draw()
+        observer.disconnect()
+      }
+    },
+    { threshold: 0.1 }
+  )
+  if (containerRef.value) observer.observe(containerRef.value)
+})
+
+watch(() => props.titleData, tryDraw)
 onUnmounted(() => {
   if (chartInstance) { chartInstance.dispose(); chartInstance = null }
+  if (observer) observer.disconnect()
 })
 </script>
 <template>
-  <div ref="chartRef" class="w-full h-[600px] bg-gradient-to-b from-blue-100 to-white rounded-lg shadow-md p-2 flex items-center justify-center relative">
+  <div ref="containerRef" class="w-full h-[600px] bg-gradient-to-b from-blue-100 to-white rounded-lg shadow-md p-2 flex items-center justify-center relative">
+    <div ref="chartRef" class="w-full h-full"></div>
     <transition name="fade">
       <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
         <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

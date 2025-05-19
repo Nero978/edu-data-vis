@@ -5,8 +5,10 @@ const props = defineProps({ data: Object })
 const hourRef = ref(null)
 const typeRef = ref(null)
 const rateRef = ref(null)
+const containerRef = ref(null)
+const isVisible = ref(false)
 const loading = ref(true)
-let hourChart, typeChart, rateChart
+let hourChart, typeChart, rateChart, observer = null
 
 function draw() {
   loading.value = true
@@ -61,17 +63,35 @@ function draw() {
   loading.value = false
 }
 
-onMounted(draw)
-watch(() => props.data, draw)
+function tryDraw() {
+  if (isVisible.value) draw()
+}
+
+onMounted(() => {
+  observer = new window.IntersectionObserver(
+    entries => {
+      if (entries[0].isIntersecting) {
+        isVisible.value = true
+        draw()
+        observer.disconnect()
+      }
+    },
+    { threshold: 0.1 }
+  )
+  if (containerRef.value) observer.observe(containerRef.value)
+})
+
+watch(() => props.data, tryDraw)
 
 onUnmounted(() => {
   if (hourChart) { hourChart.dispose(); hourChart = null }
   if (typeChart) { typeChart.dispose(); typeChart = null }
   if (rateChart) { rateChart.dispose(); rateChart = null }
+  if (observer) observer.disconnect()
 })
 </script>
 <template>
-  <div style="display:flex;gap:24px;flex-wrap:wrap">
+  <div ref="containerRef" style="display:flex;gap:24px;flex-wrap:wrap">
     <div ref="hourRef" class="w-full h-[400px] bg-gradient-to-b from-blue-100 to-white rounded-lg shadow-md p-2 flex items-center justify-center relative">
       <transition name="fade">
         <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
