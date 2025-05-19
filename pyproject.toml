@@ -5,20 +5,6 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "asgiref==3.7.2",
-    "distlib==0.3.8",
-    "django==5.0",
-    "django-cors-headers==4.3.1",
-    "djangorestframework==3.14.0",
-    "filelock==3.13.1",
-    "matplotlib==3.7.3",
-    "opencv-python==4.8.1.78",
-    "platformdirs==4.1.0",
-    "pytz==2023.3.post1",
-    "scipy==1.11.3",
-    "sounddevice==0.4.6",
-    "sqlparse==0.4.4",
-    "tzdata==2023.3",
-    "uv==0.7.5",
-    "virtualenv==20.25.0",
+    "fastapi>=0.115.12",
+    "uvicorn>=0.34.2",
 ]
