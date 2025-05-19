@@ -130,70 +130,102 @@ function analyzeModeMastery() {
 </script>
 
 <template>
-  <div class="bg-gradient-to-b from-blue-50 to-white min-h-screen pb-16 relative">
+  <template v-if="globalLoading">
     <transition name="fade">
-      <div v-if="globalLoading" class="fixed inset-0 flex items-center justify-center bg-white/70 z-50">
-        <svg class="animate-spin h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <div class="fixed inset-0 flex items-center justify-center bg-white/70 z-50">
+        <svg class="animate-spin h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
         </svg>
       </div>
     </transition>
-    <div v-if="!globalLoading">
+  </template>
+  <template v-else>
+    <div class="bg-gradient-to-b from-blue-50 to-white min-h-screen pb-16 relative">
       <div class="max-w-5xl mx-auto px-4 py-6">
         <h1 class="text-3xl font-bold text-center text-blue-700 mb-8 tracking-wide drop-shadow">教育数据可视化分析系统</h1>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">学生性别比例可视化</h2>
-          <div class="bg-white rounded-lg shadow p-4"><GenderChart :data="studentData" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <GenderChart :data="studentData" />
+          </div>
         </section>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">学生专业与年龄分布</h2>
-          <div class="bg-white rounded-lg shadow p-4"><StudentMajorAgeChart :data="studentData" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <StudentMajorAgeChart :data="studentData" />
+          </div>
         </section>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">知识点题目数量可视化</h2>
-          <div class="bg-white rounded-lg shadow p-4"><TitleChart :data="titleData" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <TitleChart :data="titleData" />
+          </div>
         </section>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">题目分数分布与知识点-分数热力图</h2>
-          <div class="bg-white rounded-lg shadow p-4"><TitleScoreChart :titleData="titleData" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <TitleScoreChart :titleData="titleData" />
+          </div>
         </section>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">题目-知识点-从属知识点关系图</h2>
-          <div class="bg-white rounded-lg shadow p-4"><TitleKnowledgeGraph :titleData="titleData" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <TitleKnowledgeGraph :titleData="titleData" />
+          </div>
         </section>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">各班级提交总数可视化</h2>
-          <div class="bg-white rounded-lg shadow p-4"><SubmitChart :data="submitRecords" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <SubmitChart :data="submitRecords" />
+          </div>
         </section>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">知识点掌握度评估</h2>
-          <div class="bg-white rounded-lg shadow p-4"><KnowledgeMasteryChart :data="knowledgeMastery" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <KnowledgeMasteryChart :data="knowledgeMastery" />
+          </div>
         </section>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">学习者画像分析</h2>
-          <div class="bg-white rounded-lg shadow p-4"><UserProfileCharts :data="userProfile" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <UserProfileCharts :data="userProfile" />
+          </div>
         </section>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">各编程语言下不同答题状态的用时分布</h2>
-          <div class="bg-white rounded-lg shadow p-4"><StateTimeMemoryChart :submitRecords="submitRecords" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <StateTimeMemoryChart :submitRecords="submitRecords" />
+          </div>
         </section>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">编程语言与知识掌握程度关系</h2>
-          <div class="bg-white rounded-lg shadow p-4"><LangKnowledgeChart :data="modeMastery" :langs="langs" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <LangKnowledgeChart :data="modeMastery" :langs="langs" />
+          </div>
           <div class="text-gray-600 text-sm mt-2">
             <b>简要分析：</b>不同编程语言（method字段）下，各知识点的正确率曲线如上图所示。某些编程语言在大多数知识点上表现出更高的正确率，说明其有助于知识的深度理解和长期记忆。若某编程语言在部分知识点上正确率偏低，提示该语言下对相关知识的掌握存在薄弱环节，可针对性优化学习内容或教学策略。
           </div>
         </section>
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-blue-600 mb-2">题目难度与答题者知识掌握度关系</h2>
-          <div class="bg-white rounded-lg shadow p-4"><DifficultUnreasonableChart :submitRecords="submitRecords" :titleData="titleData" /></div>
+          <div class="bg-white rounded-lg shadow p-4">
+            <DifficultUnreasonableChart :submitRecords="submitRecords" :titleData="titleData" />
+          </div>
         </section>
       </div>
     </div>
-  </div>
+  </template>
 </template>
 <style scoped>
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

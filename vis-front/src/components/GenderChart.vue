@@ -10,33 +10,23 @@ let observer = null
 const loading = ref(true)
 
 async function draw() {
+  if (!isVisible.value || !chartRef.value) return
   loading.value = true
   await nextTick()
   if (!props.data?.length || !chartRef.value) {
     loading.value = false
     return
   }
-  const genderCount = props.data.reduce((acc, cur) => {
-    const gender = cur['sex']
-    if (gender) acc[gender] = (acc[gender] || 0) + 1
-    return acc
-  }, {})
-  if (!chartInstance && chartRef.value) chartInstance = echarts.init(chartRef.value)
-  if (chartInstance) {
-    chartInstance.setOption({
-      title: { text: '学生性别比例' },
-      tooltip: {},
-      legend: { data: ['人数'] },
-      xAxis: { type: 'category', data: Object.keys(genderCount) },
-      yAxis: { type: 'value' },
-      series: [{ name: '人数', type: 'bar', data: Object.values(genderCount) }]
-    })
-  }
+  if (!chartInstance) chartInstance = echarts.init(chartRef.value)
+  chartInstance.setOption({
+    title: { text: '学生性别比例' },
+    tooltip: {},
+    legend: { data: ['人数'] },
+    xAxis: { type: 'category', data: Object.keys(props.data.reduce((acc, cur) => { const gender = cur['sex']; if (gender) acc[gender] = (acc[gender] || 0) + 1; return acc }, {})) },
+    yAxis: { type: 'value' },
+    series: [{ name: '人数', type: 'bar', data: Object.values(props.data.reduce((acc, cur) => { const gender = cur['sex']; if (gender) acc[gender] = (acc[gender] || 0) + 1; return acc }, {})) }]
+  })
   loading.value = false
-}
-
-function tryDraw() {
-  if (isVisible.value) draw()
 }
 
 onMounted(() => {
@@ -53,12 +43,10 @@ onMounted(() => {
   if (containerRef.value) observer.observe(containerRef.value)
 })
 
-watch(() => props.data, tryDraw)
+watch(() => props.data, () => { if (isVisible.value && chartRef.value) draw() })
+
 onUnmounted(() => {
-  if (chartInstance) {
-    chartInstance.dispose()
-    chartInstance = null
-  }
+  if (chartInstance) { chartInstance.dispose(); chartInstance = null }
   if (observer) observer.disconnect()
 })
 </script>

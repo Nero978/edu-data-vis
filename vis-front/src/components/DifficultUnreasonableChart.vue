@@ -92,7 +92,7 @@ function draw() {
 }
 
 function tryDraw() {
-  if (isVisible.value) draw()
+  if (isVisible.value && chartRef.value) draw()
 }
 
 onMounted(() => {

@@ -64,7 +64,7 @@ function draw() {
 }
 
 function tryDraw() {
-  if (isVisible.value) draw()
+  if (isVisible.value && hourRef.value && typeRef.value && rateRef.value) draw()
 }
 
 onMounted(() => {

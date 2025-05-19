@@ -71,7 +71,7 @@ async function drawAge() {
 }
 
 function tryDraw() {
-  if (isVisible.value) { drawMajor(); drawAge(); }
+  if (isVisible.value && majorRef.value && ageRef.value) { drawMajor(); drawAge(); }
 }
 
 onMounted(() => {
