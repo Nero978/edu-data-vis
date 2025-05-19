@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.pyo
+*.pyd
+*.pyc
+*.pkl
+*.log
+*.sqlite3
+*.db
+*.DS_Store
+*.env
+.venv/
+venv/
+ENV/
+.env.*
+
+# Jupyter
+.ipynb_checkpoints
+
+# VSCode
+.vscode/
+
+# Node
+node_modules/
+dist/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Others
+*.swp
+*.bak
+*.tmp
+*.orig
+*.lock
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Office
+~$*
+*.tmp
+*.temp
+*.bak
+*.wbk
+*.docx~
